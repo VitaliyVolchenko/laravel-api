@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'exchange_rate' => [
+        'url' => env('EXCHANGE_RATE_API_URL', 'https://api.exchangerate-api.com/v4/latest/USD'),
+    ],
+
 ];

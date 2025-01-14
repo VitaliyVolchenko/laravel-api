@@ -196,6 +196,64 @@
                 ]
             }
         },
+        "/api/exchange-rates": {
+            "get": {
+                "tags": [
+                    "Exchange Rates"
+                ],
+                "summary": "Get the latest exchange rates",
+                "operationId": "cbcfba7adf89037eee91f7649a6f6465",
+                "responses": {
+                    "200": {
+                        "description": "Successful response with exchange rates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "rates": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "number"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to fetch exchange rates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to fetch exchange rates."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/posts": {
             "get": {
                 "tags": [
@@ -457,6 +515,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Exchange Rates",
+            "description": "API for managing currency exchange rates"
+        },
         {
             "name": "Auth",
             "description": "Auth"
