@@ -6,8 +6,8 @@ use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @OA\Tag(
@@ -60,7 +60,11 @@ class PostController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        return PostResource::collection(Post::all());
+        $posts = Cache::remember('posts', 600, function () {
+            return Post::all();
+        });
+
+        return PostResource::collection($posts);
     }
 
     /**
@@ -93,6 +97,8 @@ class PostController extends Controller
         $data = array_merge($request->validated(), ['user_id' => auth()->id()]);
 
         $post = Post::create($data);
+
+        Cache::forget('posts');
 
         return new PostResource($post);
     }
@@ -127,7 +133,11 @@ class PostController extends Controller
      */
     public function show(Post $post): PostResource
     {
-        return new PostResource($post);
+        $cachedPost = Cache::remember("post_{$post->id}", 600, function () use ($post) {
+            return $post;
+        });
+
+        return new PostResource($cachedPost);
     }
 
     /**
@@ -172,6 +182,9 @@ class PostController extends Controller
 
         $post->update($request->validated());
 
+        Cache::forget("post_{$post->id}");
+        Cache::forget('posts');
+
         return new PostResource($post);
     }
 
@@ -207,6 +220,9 @@ class PostController extends Controller
         $this->authorize('delete', $post);
 
         $post->delete();
+
+        Cache::forget("post_{$post->id}");
+        Cache::forget('posts');
 
         return response()->json(null, 204);
     }
